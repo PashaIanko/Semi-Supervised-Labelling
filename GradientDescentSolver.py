@@ -31,14 +31,10 @@ class GradientDescentSolver(GradientSolver):
                 break
             else:
                 grad = self.compute_grad(X, Y_res, labeled_idxs, unlabeled_idxs)
-
-                
-                
                 learning_rate = self.get_learning_rate()
                 updates = -learning_rate * grad
 
-
-                assert len(unlabeled_idxs) == len(grad)
+                
                 for i in range(len(grad)):
                     Y_res[unlabeled_idxs[i]] += updates[i]
                 
