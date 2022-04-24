@@ -1,5 +1,6 @@
 import numpy as np
 from numpy.linalg import norm
+from numpy import sum
 
 class GradientSolver:
     def __init__(
@@ -29,17 +30,11 @@ class GradientSolver:
 
     def compute_grad_component(self, X, Y, labeled_idxs, unlabeled_idxs, idx):
 
-        grad_component = 0.0
-            
-        for labeled_idx in labeled_idxs:
-            w_ij = self.calc_weight(X[idx], X[labeled_idx])
-            grad_component += 2 * w_ij * (Y[idx] - Y[labeled_idx])
-
-        for another_unlab_idx in unlabeled_idxs:
-            w_ij_ = self.calc_weight(X[idx], X[another_unlab_idx])
-            grad_component += 2 * w_ij_ * (Y[idx] - Y[another_unlab_idx])
-
-        return grad_component
+        # grad_component = 0.0
+        # comp_1 = np.sum([2 * self.calc_weight(X[idx], X[labeled_idx]) * (Y[idx] - Y[labeled_idx]) for labeled_idx in labeled_idxs])    
+        # comp_2 = np.sum([2 * self.calc_weight(X[idx], X[another_unlab_idx]) * (Y[idx] - Y[another_unlab_idx]) for another_unlab_idx in unlabeled_idxs])
+        # return comp_1 + comp_2  # Optimization code
+        return sum([2 * self.calc_weight(X[idx], X[labeled_idx]) * (Y[idx] - Y[labeled_idx]) for labeled_idx in labeled_idxs]) + sum([2 * self.calc_weight(X[idx], X[another_unlab_idx]) * (Y[idx] - Y[another_unlab_idx]) for another_unlab_idx in unlabeled_idxs])
 
 
     def calc_weight(self, Xi, Xj):
@@ -62,13 +57,11 @@ class GradientSolver:
         
         for labeled_idx in labeled_idxs:
             for unlab_idx in unlabeled_idxs:
-                w_ij = self.calc_weight(X[labeled_idx], X[unlab_idx])
-                res += w_ij * ((Y[labeled_idx] - Y[unlab_idx]) ** 2)
-        
+                res += self.calc_weight(X[labeled_idx], X[unlab_idx]) * ((Y[labeled_idx] - Y[unlab_idx]) ** 2)
+
         for unlab_idx in unlabeled_idxs:
             for another_unlab_idx in unlabeled_idxs:
-                w_ij = self.calc_weight(X[unlab_idx], X[another_unlab_idx])
-                res += 0.5 * w_ij * ((Y[unlab_idx] - Y[another_unlab_idx]) ** 2)
+                res += 0.5 * self.calc_weight(X[unlab_idx], X[another_unlab_idx]) * ((Y[unlab_idx] - Y[another_unlab_idx]) ** 2)
         
         return res
     
