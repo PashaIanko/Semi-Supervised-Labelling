@@ -23,7 +23,7 @@ class GradientDescentSolver(GradientSolver):
 
         assert(self.lr_strategy == 'lr_constant')  # optimization, now work with lr==const
         learning_rate = self.get_learning_rate()
-        
+        print(f'Optimized')
         for i in range(iter_limit):
             loss = self.compute_loss(X, Y_res, labeled_idxs, unlabeled_idxs)
             self.losses.append(loss)
