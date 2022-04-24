@@ -7,12 +7,13 @@ class GradientDescentSolver(GradientSolver):
         super().__init__(*args, **kwargs)
 
 
-    def solve(self, X, Y, iter_limit, delta_loss_limit, stop_loss):
+    def solve(self, X, Y, iter_limit, delta_loss_limit, stop_loss, weight_matrix = None):
 
         labeled_idxs = np.where(Y != DataProperties.unlabeled)[0]
         unlabeled_idxs = np.where(Y == DataProperties.unlabeled)[0]
 
         Y_res = np.ndarray.copy(Y)
+
         
         # fix initial approximation
         Y_res[Y_res == DataProperties.unlabeled] = 0.5
@@ -21,14 +22,19 @@ class GradientDescentSolver(GradientSolver):
         self.losses = []
         self.n_iterations = 0
 
+        if weight_matrix is None:
+            self.calc_weight_matrix(X)
+        else:
+            self.weight_matrix = weight_matrix  # to keep time safe, not recalculating in every solver
+
         assert(self.lr_strategy == 'lr_constant')  # optimization, now work with lr==const
         learning_rate = self.get_learning_rate()
-        print(f'Optimized')
+        
         for i in range(iter_limit):
             loss = self.compute_loss(X, Y_res, labeled_idxs, unlabeled_idxs)
             self.losses.append(loss)
             delta_loss = abs(loss - loss_prev)
-            print(f'Loss: {loss}, delta loss: {delta_loss}')
+            print(f'Iteration: {i}, Loss: {loss}, delta loss: {delta_loss}')
 
             if not ((delta_loss < delta_loss_limit) or (loss < stop_loss)):
                 updates = -learning_rate * self.compute_grad(X, Y_res, labeled_idxs, unlabeled_idxs)

@@ -1,5 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from numpy.linalg import norm
+from numpy import zeros
+
 
 def plot_clusters(X, Y):
     fig, ax = plt.subplots()
@@ -43,3 +46,13 @@ def delabel_data (labeled_data, labeled_percent, delabel_value):
             cluster_indices[indices_to_delabel]
         ] = delabel_value
     return res
+
+
+def calc_weight_matrix(X, weight_func):
+    weight_matrix = zeros((X.shape[0], X.shape[0]))
+
+    for i in range(X.shape[0]):
+        for j in range(X.shape[0]):
+            weight_matrix[i][j] = weight_func(X[i], X[j])
+
+    return weight_matrix
