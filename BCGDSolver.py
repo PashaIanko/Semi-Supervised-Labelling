@@ -62,8 +62,11 @@ class BCGDSolver(GradientSolver):
             loss_prev = loss
             print(f'Iteration: {i}, Loss: {loss}, Delta: {delta_loss}')
     
+            if (loss < stop_loss):
+                break
+
             # Specific condition
-            if not ((delta_loss <= delta_loss_limit) or (loss < stop_loss)):
+            if not (delta_loss <= delta_loss_limit):
                 S = self.pick_block_indices(unlabeled_indices)  # Pick random permutation of unlabeled indices
                 
                 # And now we move across S and update y variable

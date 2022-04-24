@@ -36,7 +36,10 @@ class GradientDescentSolver(GradientSolver):
             delta_loss = abs(loss - loss_prev)
             print(f'Iteration: {i}, Loss: {loss}, delta loss: {delta_loss}')
 
-            if not ((delta_loss < delta_loss_limit) or (loss < stop_loss)):
+            if loss < stop_loss:
+                break
+
+            if not (delta_loss < delta_loss_limit):
                 updates = -learning_rate * self.compute_grad(X, Y_res, labeled_idxs, unlabeled_idxs)
                 for i in range(len(updates)): Y_res[unlabeled_idxs[i]] += updates[i] 
                 
