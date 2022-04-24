@@ -6,7 +6,8 @@ class GradientDescentSolver(GradientSolver):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def solve(self, X, Y, iter_limit, delta_loss_limit):
+
+    def solve(self, X, Y, iter_limit, delta_loss_limit, stop_loss):
 
         labeled_idxs = np.where(Y != DataProperties.unlabeled)[0]
         unlabeled_idxs = np.where(Y == DataProperties.unlabeled)[0]
@@ -26,7 +27,7 @@ class GradientDescentSolver(GradientSolver):
             print(f'Loss: {loss}, delta loss: {delta_loss}')
 
 
-            if (i > 0 and delta_loss < delta_loss_limit):
+            if ((i > 0 and delta_loss < delta_loss_limit) or (loss < stop_loss)):
                 break
             else:
                 grad = self.compute_grad(X, Y_res, labeled_idxs, unlabeled_idxs)
@@ -45,4 +46,5 @@ class GradientDescentSolver(GradientSolver):
                 self.n_iterations += 1
 
         # return Y_res
+        print('\n')
         return self.threshold_proc(Y_res)

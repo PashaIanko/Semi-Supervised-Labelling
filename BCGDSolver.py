@@ -32,7 +32,7 @@ class BCGDSolver(GradientSolver):
             return unlabeled_indices
 
 
-    def solve(self, X, Y, iter_limit, delta_loss_limit):
+    def solve(self, X, Y, iter_limit, delta_loss_limit, stop_loss):
 
         Y_res = np.ndarray.copy(Y)
         labeled_indices = np.where(Y_res != DataProperties.unlabeled)[0]
@@ -54,7 +54,7 @@ class BCGDSolver(GradientSolver):
             print(f'LOSS: {loss}, Delta: {delta_loss}')
 
             # Specific condition
-            if (i > 0) and delta_loss <= delta_loss_limit:
+            if (((i > 0) and delta_loss <= delta_loss_limit) or (loss < stop_loss)):
                 break
             else:
                 y = np.ndarray.copy(Y_res)  # y_0
