@@ -1,6 +1,7 @@
 from GradientSolver import GradientSolver
 from DataProperties import DataProperties
 import numpy as np
+import random
 
 class BCGDSolver(GradientSolver):
     def __init__(self, *args, **kwargs):
