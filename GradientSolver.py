@@ -1,4 +1,7 @@
-import numpy as np
+from numpy.linalg import norm
+from numpy import sum
+from numpy import zeros
+from numpy import array
 
 class GradientSolver:
     def __init__(
@@ -19,7 +22,17 @@ class GradientSolver:
         self.similarity_func = similarity_func
 
         self.losses = []
+        self.weights_matrix = None
         self.n_iterations = 0
+
+    
+    def calc_weight_matrix(self, X):
+        self.weight_matrix = zeros((X.shape[0], X.shape[0]))
+    
+        for i in range(X.shape[0]):
+            for j in range(X.shape[0]):
+                self.weight_matrix[i][j] = 1 / (norm(X[i] - X[j]) + 0.001)
+                
 
 
     def get_learning_rate(self):
@@ -27,54 +40,47 @@ class GradientSolver:
             return self.learning_rate   
 
     def compute_grad_component(self, X, Y, labeled_idxs, unlabeled_idxs, idx):
+        return sum([2 * self.calc_weight(idx, labeled_idx) * (Y[idx] - Y[labeled_idx]) for labeled_idx in labeled_idxs]) + sum([2 * self.calc_weight(idx, another_unlab_idx) * (Y[idx] - Y[another_unlab_idx]) for another_unlab_idx in unlabeled_idxs])
+        # grad_component = 0.0
+        # comp_1 = np.sum([2 * self.calc_weight(X[idx], X[labeled_idx]) * (Y[idx] - Y[labeled_idx]) for labeled_idx in labeled_idxs])    
+        # comp_2 = np.sum([2 * self.calc_weight(X[idx], X[another_unlab_idx]) * (Y[idx] - Y[another_unlab_idx]) for another_unlab_idx in unlabeled_idxs])
+        # return comp_1 + comp_2  # Optimization code
+        
 
-        grad_component = 0.0
-            
-        for labeled_idx in labeled_idxs:
-            w_ij = self.calc_weight(X[idx], X[labeled_idx])
-            # w_ij = np.linalg.norm(X[idx] - X[labeled_idx])
-            grad_component += 2 * w_ij * (Y[idx] - Y[labeled_idx])
+    def calc_weight(self, i, j):
+        return self.weight_matrix[i][j] # 1 / (norm(Xi - Xj) + 0.001)
 
-        for another_unlab_idx in unlabeled_idxs:
-            # w_ij_ = np.linalg.norm(X[idx] - X[another_unlab_idx])
-            w_ij_ = self.calc_weight(X[idx], X[another_unlab_idx])
-            grad_component += 2 * w_ij_ * (Y[idx] - Y[another_unlab_idx])
-
-        return grad_component
-
-
-    def calc_weight(self, Xi, Xj):
-        eps = 0.001
-        return 1 / (np.linalg.norm(Xi - Xj) + eps)  # / np.max([np.linalg.norm(Xi), np.linalg.norm(Xj)])
-
-            
     def compute_grad(self, X, Y, labeled_idxs, unlabeled_idxs):
+        return array([self.compute_grad_component(X, Y, labeled_idxs, unlabeled_idxs, idx=unlabeled_idx) for unlabeled_idx in unlabeled_idxs])
 
-        grad = []
-        for unlabeled_idx in unlabeled_idxs:
-            # compute component of gradient for this 
-            # current unlabeled
-            grad_component = self.compute_grad_component(X, Y, labeled_idxs, unlabeled_idxs, idx=unlabeled_idx)
-            grad.append(grad_component)
+        # grad = []
+        # for unlabeled_idx in unlabeled_idxs:
+        #     # compute component of gradient for this 
+        #     # current unlabeled
+        #     grad_component = self.compute_grad_component(X, Y, labeled_idxs, unlabeled_idxs, idx=unlabeled_idx)
+        #     grad.append(grad_component)
 
-        return np.array(grad)
+        # return np.array(grad)
 
     def compute_loss(self, X, Y, labeled_idxs, unlabeled_idxs):
-        res = 0
+        # Optimized code:
+        return sum([self.calc_weight(labeled_idx, unlab_idx) * ((Y[labeled_idx] - Y[unlab_idx]) ** 2) for labeled_idx in labeled_idxs for unlab_idx in unlabeled_idxs]) + 0.5 * sum([self.calc_weight(unlab_idx, another_unlab_idx) * ((Y[unlab_idx] - Y[another_unlab_idx]) ** 2) for unlab_idx in unlabeled_idxs for another_unlab_idx in unlabeled_idxs])
         
-        for labeled_idx in labeled_idxs:
-            for unlab_idx in unlabeled_idxs:
-                w_ij = self.calc_weight(X[labeled_idx], X[unlab_idx])
-                # w_ij = np.linalg.norm(X[labeled_idx] - X[unlab_idx])
-                res += w_ij * ((Y[labeled_idx] - Y[unlab_idx]) ** 2)
+        # comp_1 = sum([self.calc_weight(X[labeled_idx], X[unlab_idx]) * ((Y[labeled_idx] - Y[unlab_idx]) ** 2) for labeled_idx in labeled_idxs for unlab_idx in unlabeled_idxs]) 
+        # comp_2 = sum([0.5 * self.calc_weight(X[unlab_idx], X[another_unlab_idx]) * ((Y[unlab_idx] - Y[another_unlab_idx]) ** 2) for unlab_idx in unlabeled_idxs for another_unlab_idx in unlabeled_idxs])
+        # return comp_1 + comp_2
+
+        # res = 0
         
-        for unlab_idx in unlabeled_idxs:
-            for another_unlab_idx in unlabeled_idxs:
-                w_ij = self.calc_weight(X[unlab_idx], X[another_unlab_idx])
-                # w_ij = np.linalg.norm(X[unlab_idx] - X[another_unlab_idx])
-                res += 0.5 * w_ij * ((Y[unlab_idx] - Y[another_unlab_idx]) ** 2)
+        # for labeled_idx in labeled_idxs:
+        #     for unlab_idx in unlabeled_idxs:
+        #         res += self.calc_weight(X[labeled_idx], X[unlab_idx]) * ((Y[labeled_idx] - Y[unlab_idx]) ** 2)
+
+        # for unlab_idx in unlabeled_idxs:
+        #     for another_unlab_idx in unlabeled_idxs:
+        #         res += 0.5 * self.calc_weight(X[unlab_idx], X[another_unlab_idx]) * ((Y[unlab_idx] - Y[another_unlab_idx]) ** 2)
         
-        return res
+        # return res
     
     def threshold_proc(self, Y_preds):
         Y_preds[Y_preds > 0.5] = 1.0
