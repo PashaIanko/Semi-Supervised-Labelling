@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.linalg import norm
 
 class GradientSolver:
     def __init__(
@@ -32,11 +33,9 @@ class GradientSolver:
             
         for labeled_idx in labeled_idxs:
             w_ij = self.calc_weight(X[idx], X[labeled_idx])
-            # w_ij = np.linalg.norm(X[idx] - X[labeled_idx])
             grad_component += 2 * w_ij * (Y[idx] - Y[labeled_idx])
 
         for another_unlab_idx in unlabeled_idxs:
-            # w_ij_ = np.linalg.norm(X[idx] - X[another_unlab_idx])
             w_ij_ = self.calc_weight(X[idx], X[another_unlab_idx])
             grad_component += 2 * w_ij_ * (Y[idx] - Y[another_unlab_idx])
 
@@ -44,8 +43,7 @@ class GradientSolver:
 
 
     def calc_weight(self, Xi, Xj):
-        eps = 0.001
-        return 1 / (np.linalg.norm(Xi - Xj) + eps)  # / np.max([np.linalg.norm(Xi), np.linalg.norm(Xj)])
+        return 1 / (norm(Xi - Xj) + 0.001)
 
             
     def compute_grad(self, X, Y, labeled_idxs, unlabeled_idxs):
@@ -65,13 +63,11 @@ class GradientSolver:
         for labeled_idx in labeled_idxs:
             for unlab_idx in unlabeled_idxs:
                 w_ij = self.calc_weight(X[labeled_idx], X[unlab_idx])
-                # w_ij = np.linalg.norm(X[labeled_idx] - X[unlab_idx])
                 res += w_ij * ((Y[labeled_idx] - Y[unlab_idx]) ** 2)
         
         for unlab_idx in unlabeled_idxs:
             for another_unlab_idx in unlabeled_idxs:
                 w_ij = self.calc_weight(X[unlab_idx], X[another_unlab_idx])
-                # w_ij = np.linalg.norm(X[unlab_idx] - X[another_unlab_idx])
                 res += 0.5 * w_ij * ((Y[unlab_idx] - Y[another_unlab_idx]) ** 2)
         
         return res
