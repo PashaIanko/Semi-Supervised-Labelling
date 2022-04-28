@@ -56,3 +56,24 @@ def calc_weight_matrix(X, weight_func):
             weight_matrix[i][j] = weight_func(X[i], X[j])
 
     return weight_matrix
+
+def plot_bar_metrics(metrics_df):
+    
+    ax = metrics_df.plot.bar(
+        rot = 0,
+        ylabel = 'Metrics results',
+        cmap = 'Paired',
+        figsize = (8, 8)
+    )
+
+    ax.set_title('Models cpu time, iterations & performance', fontsize = 18)
+    ax.set_ylabel('Metrics scores', fontsize = 18)
+    ax.tick_params(axis = 'y', labelsize = 15)
+    ax.tick_params(axis = 'x', labelsize = 12)
+    ax.legend(loc = 3, prop = {'size': 13})
+    plt.grid()
+
+def normalize_cols(dataframe):
+    cols = dataframe.columns
+    for c in cols:
+        dataframe[f'{c}_norm'] = dataframe[c] / dataframe[c].max()

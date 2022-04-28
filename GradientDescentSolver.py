@@ -1,6 +1,7 @@
 from GradientSolver import GradientSolver
 from DataProperties import DataProperties
 import numpy as np
+from timeit import default_timer
 
 class GradientDescentSolver(GradientSolver):
     def __init__(self, *args, **kwargs):
@@ -20,6 +21,7 @@ class GradientDescentSolver(GradientSolver):
 
         loss_prev = 0.0
         self.losses = []
+        self.cpu_times = []
         self.n_iterations = 0
 
         if weight_matrix is None:
@@ -30,9 +32,13 @@ class GradientDescentSolver(GradientSolver):
         assert(self.lr_strategy == 'lr_constant')  # optimization, now work with lr==const
         learning_rate = self.get_learning_rate()
         
+        algo_start = default_timer()
+        
         for i in range(iter_limit):
             loss = self.compute_loss(X, Y_res, labeled_idxs, unlabeled_idxs)
             self.losses.append(loss)
+            self.cpu_times.append(default_timer() - algo_start)
+
             delta_loss = abs(loss - loss_prev)
             print(f'Iteration: {i}, Loss: {loss}, delta loss: {delta_loss}')
 
