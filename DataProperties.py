@@ -1,5 +1,5 @@
 class DataProperties:
-    n_samples = 10000
+    n_samples = 5000
     labeled_percentage = 0.05
     n_dims = 2
     n_clusters = 2
