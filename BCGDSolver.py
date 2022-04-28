@@ -2,6 +2,7 @@ from GradientSolver import GradientSolver
 from DataProperties import DataProperties
 import numpy as np
 import random
+from timeit import default_timer
 
 class BCGDSolver(GradientSolver):
     def __init__(self, *args, **kwargs):
@@ -47,6 +48,7 @@ class BCGDSolver(GradientSolver):
 
         loss_prev = 0
         self.losses = []
+        self.cpu_times = []
         self.n_iterations = 0
 
         if weight_matrix is None:
@@ -54,10 +56,13 @@ class BCGDSolver(GradientSolver):
         else:
             self.weight_matrix = weight_matrix  # to keep time safe, not recalculating in every solver
 
+        algo_start = default_timer()
 
         for i in range(iter_limit):
             loss = self.compute_loss(X, Y_res, labeled_indices, unlabeled_indices)
             self.losses.append(loss)
+            self.cpu_times.append(default_timer() - algo_start)
+
             delta_loss = abs(loss - loss_prev)
             loss_prev = loss
             print(f'Iteration: {i}, Loss: {loss}, Delta: {delta_loss}')

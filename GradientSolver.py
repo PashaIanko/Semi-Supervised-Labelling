@@ -22,6 +22,7 @@ class GradientSolver:
         self.similarity_func = similarity_func
 
         self.losses = []
+        self.cpu_times = []
         self.weights_matrix = None
         self.n_iterations = 0
 
