@@ -50,9 +50,6 @@ class GradientDescentSolver(GradientSolver):
                 print(((abs(dlosses[i] - dlosses[i - 1])) / abs(dlosses[i - 1] / dlosses[i - 2])))
                 print('Exit condition')
                 break
-            if (i > 1) and (abs(dlosses[i]) / abs(dlosses[i - 1]) < delta_percent_limit):
-                print(f'percent: {abs(dlosses[i]) / dlosses[i - 1]} {delta_percent_limit}')
-                break
 
             if loss < stop_loss or (i > 0 and delta_loss > 0):
                 print(f'Loss problems')
