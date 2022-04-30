@@ -8,7 +8,7 @@ class GradientDescentSolver(GradientSolver):
         super().__init__(*args, **kwargs)
 
 
-    def solve(self, X, Y, iter_limit, delta_loss_limit, stop_loss, weight_matrix = None):
+    def solve(self, X, Y, Y_true, iter_limit, delta_loss_limit, stop_loss, weight_matrix = None):
 
         labeled_idxs = np.where(Y != DataProperties.unlabeled)[0]
         unlabeled_idxs = np.where(Y == DataProperties.unlabeled)[0]
@@ -22,6 +22,7 @@ class GradientDescentSolver(GradientSolver):
         loss_prev = 0.0
         self.losses = []
         self.cpu_times = []
+        self.accuracies = []
         self.n_iterations = 0
 
         if weight_matrix is None:
@@ -35,6 +36,7 @@ class GradientDescentSolver(GradientSolver):
         algo_start = default_timer()
         
         for i in range(iter_limit):
+            self.update_accuracy(Y_true, Y_res)
             loss = self.compute_loss(X, Y_res, labeled_idxs, unlabeled_idxs)
             self.losses.append(loss)
             self.cpu_times.append(default_timer() - algo_start)

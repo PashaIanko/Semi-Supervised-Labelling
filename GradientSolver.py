@@ -2,6 +2,8 @@ from numpy.linalg import norm
 from numpy import sum
 from numpy import zeros
 from numpy import array
+from sklearn.metrics import accuracy_score
+from numpy import mean
 
 class GradientSolver:
     def __init__(
@@ -23,10 +25,15 @@ class GradientSolver:
 
         self.losses = []
         self.cpu_times = []
+        self.accuracies = []
         self.weights_matrix = None
         self.n_iterations = 0
 
-    
+    def update_accuracy(self, Y_true, Y):
+        correct = [(y_true == 1.0 and y > 0.5) or (y_true == 0.0 and y < 0.5) for y_true, y in zip(Y_true, Y)]
+        self.accuracies.append(sum(correct) / len(correct))
+        
+
     def calc_weight_matrix(self, X):
         self.weight_matrix = zeros((X.shape[0], X.shape[0]))
     

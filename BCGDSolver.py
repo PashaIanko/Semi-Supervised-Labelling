@@ -33,7 +33,7 @@ class BCGDSolver(GradientSolver):
             return unlabeled_indices
 
 
-    def solve(self, X, Y, iter_limit, delta_loss_limit, stop_loss, weight_matrix):
+    def solve(self, X, Y, Y_true, iter_limit, delta_loss_limit, stop_loss, weight_matrix):
 
         Y_res = np.ndarray.copy(Y)
         labeled_indices = np.where(Y_res != DataProperties.unlabeled)[0]
@@ -49,6 +49,7 @@ class BCGDSolver(GradientSolver):
         loss_prev = 0
         self.losses = []
         self.cpu_times = []
+        self.accuracies = []
         self.n_iterations = 0
 
         if weight_matrix is None:
@@ -59,6 +60,7 @@ class BCGDSolver(GradientSolver):
         algo_start = default_timer()
 
         for i in range(iter_limit):
+            self.update_accuracy(Y_true, Y_res)
             loss = self.compute_loss(X, Y_res, labeled_indices, unlabeled_indices)
             self.losses.append(loss)
             self.cpu_times.append(default_timer() - algo_start)
