@@ -49,13 +49,18 @@ def delabel_data (labeled_data, labeled_percent, delabel_value):
 
 
 def calc_weight_matrix(X, weight_func):
-    weight_matrix = zeros((X.shape[0], X.shape[0]))
+    size = X.shape[0]
+    if not (weight_func is None):
+        return [[weight_func(X[i], X[j]) for j in range(size)] for i in range(size)]
+    else:
+        return [[1 / (norm(X[i] - X[j]) + 0.001) for j in range(size)] for i in range(size)]
 
-    for i in range(X.shape[0]):
-        for j in range(X.shape[0]):
-            weight_matrix[i][j] = weight_func(X[i], X[j])
+    # weight_matrix = zeros((X.shape[0], X.shape[0]))
 
-    return weight_matrix
+    # for i in range(X.shape[0]):
+    #     for j in range(X.shape[0]):
+    #         weight_matrix[i][j] = weight_func(X[i], X[j])
+    # return weight_matrix
 
 def plot_bar_metrics(metrics_df):
     
